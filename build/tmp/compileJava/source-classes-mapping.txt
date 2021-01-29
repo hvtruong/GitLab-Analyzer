@@ -1,8 +1,8 @@
-model/Commit.java
- model.Commit
-model/Main.java
- model.Main
-model/Project.java
- model.Project
+model/CommitWrapper.java
+ model.CommitWrapper
 model/Student.java
  model.Student
+model/ProjectWrapper.java
+ model.ProjectWrapper
+model/Main.java
+ model.Main
