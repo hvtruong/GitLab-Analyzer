@@ -4,5 +4,7 @@ model/Student.java
  model.Student
 model/ProjectWrapper.java
  model.ProjectWrapper
+model/Gitlab.java
+ model.Gitlab
 model/Main.java
  model.Main

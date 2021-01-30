@@ -11,8 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Student {
-    private final String name;
-    private final String email;
+    private String studentName;
+    private String email;
+    private int studentId;
 
     private int codeScore;
     private int codeReviewScore;
@@ -23,7 +24,7 @@ public class Student {
 
 
     public String getName() {
-        return name;
+        return studentName;
     }
 
     public String getEmail() {
@@ -43,10 +44,11 @@ public class Student {
     }
 
 
-    public Student(String name, String email, Project project) {
-        this.name = name;
+    public Student(String name, String email, Project project, int id) {
+        this.studentName = name;
         this.email = email;
         this.project = project;
+        this.studentId = id;
 
         commits = new ArrayList<>();
     }

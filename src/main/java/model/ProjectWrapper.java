@@ -22,11 +22,15 @@ public class ProjectWrapper {
     public Project getProject() {
         return project;
     }
+    public String getProjectName() {
+        return projectName;
+    }
 
-    public ProjectWrapper(String name) {
+    public ProjectWrapper(Project project) {
 
         this.students = new ArrayList<>();
-        this.projectName = name;
+        this.projectName = project.getName();
+        this.project = project;
 
     }
 

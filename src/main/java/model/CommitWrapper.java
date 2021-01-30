@@ -10,7 +10,7 @@ import java.util.List;
 /*
 Wrapper class designed to encapsulate the commit code from the gitlab library
 
-Needed as the commit data and code differences are seperated into 2 different objects
+Needed as the commit data and code differences are separated into 2 different objects
 
  */
 
