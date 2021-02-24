@@ -58,7 +58,7 @@ public class GlobalExceptionHandler {
 
         log.info(new Exception().getStackTrace()[0].getMethodName());
 
-        return buildResponseEntity(buildStandardError(exception, "Validation error",request, HttpStatus.BAD_REQUEST));
+        return buildResponseEntity(buildStandardError(exception, "Error",request, exception.getStatus()));
 
     }
 
