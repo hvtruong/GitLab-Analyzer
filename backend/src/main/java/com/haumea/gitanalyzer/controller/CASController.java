@@ -21,9 +21,8 @@ public class CASController {
 
     @GetMapping("/login")
     public String getCASUserId(HttpServletRequest request){
-        String UserId = request.getRemoteUser();
+        return request.getRemoteUser();
 
-        return UserId;
     }
 
     @GetMapping("/logout")
