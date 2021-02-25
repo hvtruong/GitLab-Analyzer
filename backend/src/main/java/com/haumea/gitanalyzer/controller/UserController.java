@@ -34,8 +34,8 @@ public class UserController {
     }
 
     @GetMapping("/token")
-    public String getPersonalAccessToken(@RequestParam @NotBlank String userId){
-      return userService.getPersonalAccessToken(userId);
+    public String getPersonalAccessToken(HttpServletRequest request){
+      return userService.getPersonalAccessToken(request.getRemoteUser());
     }
 
     @Deprecated
