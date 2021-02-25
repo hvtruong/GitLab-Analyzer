@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
@@ -29,13 +30,13 @@ public class MergeRequestController {
     }
 
     @GetMapping
-    public List<MergeRequestDTO> getAllMergeRequests(@NotBlank @RequestParam String userId,
+    public List<MergeRequestDTO> getAllMergeRequests(HttpServletRequest request,
                                                      @NotNull @RequestParam int projectId,
                                                      @NotBlank @RequestParam String memberId,
                                                      @NotNull @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") Date start,
                                                      @NotNull @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") Date end,
                                                      @RequestParam (required = false, defaultValue = "false") boolean memberFilter){
 
-        return mergeRequestService.getAllMergeRequests(userId, projectId, memberId, start, end, memberFilter);
+        return mergeRequestService.getAllMergeRequests(request.getRemoteUser(), projectId, memberId, start, end, memberFilter);
     }
 }

@@ -9,6 +9,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -27,10 +28,10 @@ public class MemberController {
     }
 
     @GetMapping
-    public List<String> getMembers(@RequestParam @NotBlank String userId,
+    public List<String> getMembers(HttpServletRequest request,
                                    @RequestParam @NotNull Integer projectId){
 
-        return memberService.getMembers(userId, projectId);
+        return memberService.getMembers(request.getRemoteUser(), projectId);
     }
 
     @PostMapping("alias")

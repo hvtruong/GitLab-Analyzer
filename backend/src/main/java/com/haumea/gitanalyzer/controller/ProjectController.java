@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
@@ -26,8 +27,8 @@ public class ProjectController {
     }
 
     @GetMapping
-    public List<ProjectDTO> getProjects(@NotBlank @RequestParam String userId){
+    public List<ProjectDTO> getProjects(HttpServletRequest request){
 
-        return projectService.getProjects(userId);
+        return projectService.getProjects(request.getRemoteUser());
     }
 }

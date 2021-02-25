@@ -4,12 +4,9 @@ import com.haumea.gitanalyzer.dto.CommitDTO;
 import com.haumea.gitanalyzer.service.CommitService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.ParseException;
-
-
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.*;
@@ -26,32 +23,32 @@ public class CommitController {
     }
 
     @GetMapping("mergeRequests/{mergeRequestId}/members/{memberId}")
-    public List<CommitDTO> getMergeRequestCommitsForMember(@RequestParam @NotBlank String userId,
+    public List<CommitDTO> getMergeRequestCommitsForMember(HttpServletRequest request,
                                                            @RequestParam @NotNull Integer projectId,
                                                            @PathVariable @NotNull Integer mergeRequestId,
                                                            @PathVariable @NotBlank String memberId) {
 
-        return commitService.getMergeRequestCommitsForMember(userId, projectId, mergeRequestId, memberId);
+        return commitService.getMergeRequestCommitsForMember(request.getRemoteUser(), projectId, mergeRequestId, memberId);
     }
 
     @GetMapping("/members/{memberId}")
-    public List<CommitDTO> getCommitsForMemberAndDate(@PathVariable @NotBlank String memberId,
-                                                      @RequestParam @NotBlank String userId,
+    public List<CommitDTO> getCommitsForMemberAndDate(HttpServletRequest request,
+                                                      @PathVariable @NotBlank String memberId,
                                                       @RequestParam @NotNull int projectId,
                                                       @NotNull @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") Date start,
                                                       @NotNull @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") Date end) {
 
 
-        return commitService.getCommitsForSelectedMemberAndDate(userId, projectId, memberId, start, end);
+        return commitService.getCommitsForSelectedMemberAndDate(request.getRemoteUser(), projectId, memberId, start, end);
     }
 
     @GetMapping("/mergeRequests/{mergeRequestId}")
-    public List<CommitDTO> getCommitsForSelectedMergeRequest(@PathVariable @NotNull int mergeRequestId,
-                                                             @RequestParam @NotBlank String userId,
+    public List<CommitDTO> getCommitsForSelectedMergeRequest(HttpServletRequest request,
+                                                             @PathVariable @NotNull int mergeRequestId,
                                                              @RequestParam @NotNull int projectId) {
 
 
-        return commitService.getCommitsForSelectedMergeRequest(userId, projectId, mergeRequestId);
+        return commitService.getCommitsForSelectedMergeRequest(request.getRemoteUser(), projectId, mergeRequestId);
     }
 
 
