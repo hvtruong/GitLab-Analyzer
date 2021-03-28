@@ -98,20 +98,15 @@ public class UserService {
 
     }
 
-    public Configuration createDefaultConfig(String userId, Integer projectId){
+    public Configuration createDefaultConfig(){
 
-        GitlabService gitlabService = createGitlabService(userId);
-
-        // cannot delegate to project service to avoid circular dependency
-        ProjectWrapper projectWrapper = new ProjectWrapper(gitlabService.getSelectedProject(projectId));
-        Date start = projectWrapper.getProject().getCreatedAt();
         return new Configuration();
 
     }
 
-    public Configuration getConfiguration(String userId, Integer projectId){
+    public Configuration getConfiguration(String userId){
 
-        Configuration configuration = createDefaultConfig(userId, projectId);
+        Configuration configuration = createDefaultConfig();
         Optional<String> activeConfig;
 
         try{

@@ -10,6 +10,7 @@ import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 
 @Document(collection = "user")
@@ -41,23 +42,23 @@ public class User {
         this.end = end;
     }
 
-    public String getUserId() {
-        return userId;
+    public Optional<String> getUserId() {
+        return Optional.ofNullable(userId);
     }
 
-    public String getPersonalAccessToken() {
-        return personalAccessToken;
+    public Optional<String> getPersonalAccessToken() {
+        return Optional.ofNullable(personalAccessToken);
     }
 
     public List<Configuration> getConfigurations() {
         return configurations;
     }
 
-    public String getGitlabServer() { return gitlabServer; }
+    public Optional<String> getGitlabServer() { return Optional.ofNullable(gitlabServer); }
 
-    public String getActiveConfig() { return activeConfig; }
+    public Optional<String> getActiveConfig() { return Optional.ofNullable(activeConfig); }
 
-    public Date getStart() { return start; }
+    public Optional<Date> getStart() { return Optional.ofNullable(start); }
 
-    public Date getEnd() { return end; }
+    public Optional<Date> getEnd() { return Optional.ofNullable(end); }
 }

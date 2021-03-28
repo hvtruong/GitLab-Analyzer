@@ -36,7 +36,7 @@ public class UserRepository {
 
     public User saveUser(User user) throws ResourceAlredyExistException {
 
-        if(!findUserByUserId(user.getUserId()).isPresent()) {
+        if(!findUserByUserId(user.getUserId().get()).isPresent()) {
             mongoTemplate.save(user);
         }
         else {
@@ -49,25 +49,25 @@ public class UserRepository {
     public User updateUser(User user) throws ResourceNotFoundException {
 
         Query query = new Query();
-        query.addCriteria(Criteria.where("userId").is(user.getUserId()));
+        query.addCriteria(Criteria.where("userId").is(user.getUserId().get()));
         Update update = new Update();
-        if(user.getPersonalAccessToken() != null && !user.getPersonalAccessToken().trim().isEmpty()) {
-            update.set("personalAccessToken", user.getPersonalAccessToken());
+        if(user.getPersonalAccessToken().isPresent() && !user.getPersonalAccessToken().get().trim().isEmpty()) {
+            update.set("personalAccessToken", user.getPersonalAccessToken().get());
         }
-        if(user.getGitlabServer() != null && !user.getGitlabServer().trim().isEmpty()) {
-            update.set("gitlabServer", user.getGitlabServer());
+        if(user.getGitlabServer().isPresent() && !user.getGitlabServer().get().trim().isEmpty()) {
+            update.set("gitlabServer", user.getGitlabServer().get());
         }
-        if(user.getActiveConfig() != null && !user.getActiveConfig().trim().isEmpty()) {
-            if(!getConfigurationFileNames(user.getUserId()).contains(user.getActiveConfig())){
-                throw new ResourceNotFoundException("configuration named '" + user.getActiveConfig() + "' not found!");
+        if(user.getActiveConfig().isPresent() && !user.getActiveConfig().get().trim().isEmpty()) {
+            if(!getConfigurationFileNames(user.getUserId().get()).contains(user.getActiveConfig().get())){
+                throw new ResourceNotFoundException("configuration named '" + user.getActiveConfig().get() + "' not found!");
             }
-            update.set("activeConfig", user.getActiveConfig());
+            update.set("activeConfig", user.getActiveConfig().get());
         }
-        if(user.getStart() != null){
-            update.set("start", user.getStart());
+        if(user.getStart().isPresent()){
+            update.set("start", user.getStart().get());
         }
-        if(user.getEnd() != null){
-            update.set("end", user.getEnd());
+        if(user.getEnd().isPresent()){
+            update.set("end", user.getEnd().get());
         }
 
         if(mongoTemplate.findAndModify(query, update, User.class) == null) {
@@ -79,78 +79,35 @@ public class UserRepository {
 
     public String getPersonalAccessToken(String userId) throws ResourceNotFoundException {
 
-        Optional<User> user = findUserByUserId(userId);
+        User user = findUserByUserId(userId).orElseThrow(() -> new ResourceNotFoundException("User not found!"));
 
-        if(!user.isPresent()){
-            throw new ResourceNotFoundException("User not found!");
-        }
-
-        String token = user.get().getPersonalAccessToken();
-
-        if(token == null) {
-            throw new ResourceNotFoundException("Token not found!");
-        }
-
-        return token;
+        return user.getPersonalAccessToken().orElseThrow(() -> new ResourceNotFoundException("Token not found!"));
     }
 
     public String getGitlabServer(String userId) throws ResourceNotFoundException {
 
-        Optional<User> user = findUserByUserId(userId);
+        User user = findUserByUserId(userId).orElseThrow(() -> new ResourceNotFoundException("User not found!"));
 
-        if(!user.isPresent()){
-            throw new ResourceNotFoundException("User not found!");
-        }
-
-        String gitlabServer = user.get().getGitlabServer();
-
-        if(gitlabServer == null){
-            throw new ResourceNotFoundException("Gitlab Server not found!");
-        }
-
-        return gitlabServer;
+        return user.getGitlabServer().orElseThrow(() -> new ResourceNotFoundException("Gitlab Server not found!"));
     }
 
     public Date getStart(String userId) throws ResourceNotFoundException {
 
-        Optional<User> user = findUserByUserId(userId);
+        User user = findUserByUserId(userId).orElseThrow(() -> new ResourceNotFoundException("User not found!"));
 
-        if(!user.isPresent()){
-            throw new ResourceNotFoundException("User not found!");
-        }
-
-        Date start = user.get().getStart();
-
-        if(start == null){
-            throw new ResourceNotFoundException("Start date not found!");
-        }
-
-        return start;
+        return user.getStart().orElseThrow(() -> new ResourceNotFoundException("Start date not found!"));
     }
 
     public Date getEnd(String userId) throws ResourceNotFoundException {
 
-        Optional<User> user = findUserByUserId(userId);
+        User user = findUserByUserId(userId).orElseThrow(() -> new ResourceNotFoundException("User not found!"));
 
-        if(!user.isPresent()){
-            throw new ResourceNotFoundException("User not found!");
-        }
-
-        Date end = user.get().getEnd();
-
-        if(end == null){
-            throw new ResourceNotFoundException("End date not found!");
-        }
-
-        return end;
+        return user.getEnd().orElseThrow(() -> new ResourceNotFoundException("End date not found!"));
     }
 
     public void deleteActiveConfig(String userId){
-        Optional<User> user = findUserByUserId(userId);
 
-        if(!user.isPresent()){
-            throw new ResourceNotFoundException("User not found!");
-        }
+        User user = findUserByUserId(userId).orElseThrow(() -> new ResourceNotFoundException("User not found!"));
 
         Query query = new Query();
         query.addCriteria(Criteria.where("userId").is(userId));
@@ -162,30 +119,16 @@ public class UserRepository {
 
     public String getActiveConfig(String userId) throws ResourceNotFoundException {
 
-        Optional<User> user = findUserByUserId(userId);
+        User user = findUserByUserId(userId).orElseThrow(() -> new ResourceNotFoundException("User not found!"));
 
-        if(!user.isPresent()){
-            throw new ResourceNotFoundException("User not found!");
-        }
-
-        String activeConfig = user.get().getActiveConfig();
-
-        if(activeConfig == null){
-            throw new ResourceNotFoundException("Default Config not found!");
-        }
-
-        return activeConfig;
+        return user.getActiveConfig().orElseThrow(() -> new ResourceNotFoundException("Default Config not found!"));
     }
 
     public List<String> getConfigurationFileNames(String userId) throws ResourceNotFoundException {
 
-        Optional<User> user = findUserByUserId(userId);
+        User user = findUserByUserId(userId).orElseThrow(() -> new ResourceNotFoundException("User not found!"));
 
-        if(!user.isPresent()) {
-            throw new ResourceNotFoundException("User not found!");
-        }
-
-        List<Configuration> userConfigurations = user.get().getConfigurations();
+        List<Configuration> userConfigurations = user.getConfigurations();
         List<String> fileNames = new ArrayList<>();
         for(Configuration userConfiguration : userConfigurations) {
             String fileName = userConfiguration.getFileName();
@@ -196,17 +139,13 @@ public class UserRepository {
 
     public User saveConfiguration(String userId, Configuration configuration) throws ResourceNotFoundException, ResourceAlredyExistException {
 
-        Optional<User> user = findUserByUserId(userId);
+        User user = findUserByUserId(userId).orElseThrow(() -> new ResourceNotFoundException("User not found!"));
 
-        if(!user.isPresent()) {
-            throw new ResourceNotFoundException("User not found!");
-        }
-
-        List<String> fileNames = getConfigurationFileNames(user.get().getUserId());
+        List<String> fileNames = getConfigurationFileNames(user.getUserId().get());
 
         if(!fileNames.contains(configuration.getFileName())) {
             Query query = new Query();
-            query.addCriteria(Criteria.where("userId").is(user.get().getUserId()));
+            query.addCriteria(Criteria.where("userId").is(user.getUserId().get()));
             Update update = new Update();
             update.push("configurations", configuration);
             mongoTemplate.updateFirst(query, update, User.class);
@@ -215,18 +154,14 @@ public class UserRepository {
             throw new ResourceAlredyExistException("Configuration with this name already exist!");
         }
 
-        return user.get();
+        return user;
     }
 
     public Configuration getConfigurationByFileName(String userId, String configFileName) throws ResourceNotFoundException {
 
-        Optional<User> user = findUserByUserId(userId);
+        User user = findUserByUserId(userId).orElseThrow(() -> new ResourceNotFoundException("User not found!"));
 
-        if(!user.isPresent()) {
-            throw new ResourceNotFoundException("User not found!");
-        }
-
-        List<String> fileNames = getConfigurationFileNames(user.get().getUserId());
+        List<String> fileNames = getConfigurationFileNames(user.getUserId().get());
 
         if(!fileNames.contains(configFileName)) {
             throw new ResourceNotFoundException("Configuration with this name does not exist!");
@@ -234,7 +169,7 @@ public class UserRepository {
 
         Configuration requestedConfig = null;
 
-        for(Configuration userConfig : user.get().getConfigurations()) {
+        for(Configuration userConfig : user.getConfigurations()) {
             if(userConfig.getFileName().equals(configFileName)) {
                 requestedConfig = userConfig;
             }
@@ -245,17 +180,13 @@ public class UserRepository {
 
     public User updateConfiguration(String userId, Configuration configuration) throws ResourceNotFoundException {
 
-        Optional<User> user = findUserByUserId(userId);
+        User user = findUserByUserId(userId).orElseThrow(() -> new ResourceNotFoundException("User not found!"));
 
-        if(!user.isPresent()) {
-            throw new ResourceNotFoundException("User not found!");
-        }
-
-        List<String> fileNames = getConfigurationFileNames(user.get().getUserId());
+        List<String> fileNames = getConfigurationFileNames(user.getUserId().get());
 
         if(fileNames.contains(configuration.getFileName())) {
             Query query = new Query();
-            query.addCriteria(Criteria.where("userId").is(user.get().getUserId())
+            query.addCriteria(Criteria.where("userId").is(user.getUserId().get())
                                         .and("configurations.fileName").is(configuration.getFileName()));
             Update update = new Update();
             update.set("configurations.$", configuration);
@@ -265,27 +196,23 @@ public class UserRepository {
             throw new ResourceNotFoundException("Configuration with this name does not exist!");
         }
 
-        return user.get();
+        return user;
 
     }
 
     public User deleteConfiguration(String userId, String fileName) throws ResourceNotFoundException {
 
-        Optional<User> user = findUserByUserId(userId);
+        User user = findUserByUserId(userId).orElseThrow(() -> new ResourceNotFoundException("User not found!"));
 
-        if(!user.isPresent()) {
-            throw new ResourceNotFoundException("User not found!");
-        }
-
-        List<String> fileNames = getConfigurationFileNames(user.get().getUserId());
+        List<String> fileNames = getConfigurationFileNames(user.getUserId().get());
 
         if(fileNames.contains(fileName)) {
             Query query = new Query();
-            query.addCriteria(Criteria.where("userId").is(user.get().getUserId())
+            query.addCriteria(Criteria.where("userId").is(user.getUserId().get())
                     .and("configurations.fileName").is(fileName));
             Update update = new Update();
             update.pull("configurations", new BasicDBObject("fileName", fileName));
-            if(user.get().getActiveConfig().equals(fileName)){
+            if(user.getActiveConfig().isPresent() && user.getActiveConfig().get().equals(fileName)){
                 update.unset("activeConfig");
             }
             mongoTemplate.updateFirst(query, update, User.class);
@@ -294,7 +221,7 @@ public class UserRepository {
             throw new ResourceNotFoundException("Configuration with this name does not exist!");
         }
 
-        return user.get();
+        return user;
     }
 
 }

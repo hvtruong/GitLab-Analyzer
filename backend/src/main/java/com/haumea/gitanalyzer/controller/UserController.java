@@ -117,8 +117,7 @@ public class UserController {
     }
 
     @GetMapping("/configuration/default")
-    public Configuration getDefaultConfiguration(@RequestParam @NotBlank String userId,
-                                                 @RequestParam @NotNull Integer projectId){
-        return userService.createDefaultConfig(userId, projectId);
+    public Configuration getDefaultConfiguration(){
+        return userService.createDefaultConfig();
     }
 }
