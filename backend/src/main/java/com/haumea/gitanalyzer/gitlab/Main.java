@@ -125,8 +125,33 @@ public class Main {
 //        test.testGetCommitDiffs(25516, "166db39fc209f76d0be475cfc0b0be3d021e9070");
 //
 //        test.testGetMergeRequestDiffs(25516, 52);
+//
+//        test.testScoreCalculator(27200);
 
-        test.testScoreCalculator(27200);
+        test.testGetIssueComments(
+                25516,
+                createDateFromString("2021-01-07T00:00:00-08:00"),
+                createDateFromString("2021-02-22T02:30:00-08:00"));
+
+        test.testGetIssueCommentsByAuthor(
+                25516,
+                createDateFromString("2021-01-07T00:00:00-08:00"),
+                createDateFromString("2021-02-22T02:30:00-08:00"),
+                new ArrayList<String>(Arrays.asList("tmbui")));
+
+        test.testGetMRComments(
+                25516,
+                "master",
+                createDateFromString("2021-01-07T00:00:00-08:00"),
+                createDateFromString("2021-02-22T02:30:00-08:00"));
+
+        test.testGetMRCommentsByAuthor(
+                25516,
+                "master",
+                createDateFromString("2021-01-07T00:00:00-08:00"),
+                createDateFromString("2021-02-22T02:30:00-08:00"),
+                new ArrayList<String>(Arrays.asList("tmbui")));
+
 
     }
 

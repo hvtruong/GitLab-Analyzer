@@ -1,6 +1,7 @@
 package com.haumea.gitanalyzer.gitlab;
 
 import com.haumea.gitanalyzer.exception.GitLabRuntimeException;
+import io.swagger.models.auth.In;
 import org.gitlab4j.api.*;
 import org.gitlab4j.api.models.*;
 
@@ -21,6 +22,8 @@ public class GitlabService {
     private MergeRequestApi mergeRequestApi;
     private CommitsApi commitsApi;
     private ProjectApi projectApi;
+    private IssuesApi issuesApi;
+    private NotesApi notesApi;
     private String hostUrl;
     private String personalAccessToken;
 
@@ -31,6 +34,8 @@ public class GitlabService {
         this.projectApi = new ProjectApi(gitLabApi);
         this.mergeRequestApi = new MergeRequestApi(gitLabApi);
         this.commitsApi = new CommitsApi(gitLabApi);
+        this.issuesApi = new IssuesApi(gitLabApi);
+        this.notesApi = new NotesApi(gitLabApi);
     }
 
     public GitLabApi getGitLabApi() {
@@ -463,11 +468,23 @@ public class GitlabService {
     }
 
     public List<Commit> getAllCommitsNoDiff(Integer projectId){
+
+        List<Commit> commits;
+
         try {
-            return commitsApi.getCommits(projectId);
+            commits = commitsApi.getCommits(projectId);
         }catch (GitLabApiException e){
             throw new GitLabRuntimeException(e.getLocalizedMessage());
         }
+
+        List<Commit> filteredCommits = new ArrayList<>();
+        for(Commit commit : commits){
+            if(!isMergedMRCommits(commit.getMessage())){
+                filteredCommits.add(commit);
+            }
+        }
+
+        return filteredCommits;
     }
 
     public List<CommitWrapper> getAllCommitsWithDiff(Integer projectId){
@@ -476,9 +493,12 @@ public class GitlabService {
         List<CommitWrapper> commitList = new ArrayList<>();
 
         for(Commit current : commits) {
-            CommitWrapper newCommit = new CommitWrapper(projectId, commitsApi, current);
 
-            commitList.add(newCommit);
+            if(!isMergedMRCommits(current.getMessage())){
+                CommitWrapper newCommit = new CommitWrapper(projectId, commitsApi, current);
+
+                commitList.add(newCommit);
+            }
         }
 
         return commitList;
@@ -501,6 +521,92 @@ public class GitlabService {
         } catch (GitLabApiException e){
             throw new GitLabRuntimeException(e.getLocalizedMessage());
         }
+
+    }
+
+    public List<CommentWrapper> getIssueComments(Integer projectId, Date start, Date end){
+        IssueFilter issueFilter = new IssueFilter();
+        issueFilter.setCreatedBefore(end);
+        issueFilter.setCreatedAfter(start);
+
+        List<CommentWrapper> issueComments = new ArrayList<>();
+
+        try{
+            List<Issue> issues = issuesApi.getIssues(projectId, issueFilter);
+            for(Issue issue : issues){
+                List<Note> issueNotes = notesApi.getIssueNotes(projectId, issue.getIid());
+                for(Note note : issueNotes){
+                    String commentAuthor = note.getAuthor().getUsername();
+                    String issueAuthor = issue.getAuthor().getUsername();
+                    CommentWrapper commentWrapper = new CommentWrapper(
+                            issue.getWebUrl(),
+                            note,
+                            commentAuthor.equals(issueAuthor));
+
+                    issueComments.add(commentWrapper);
+                }
+            }
+        } catch (GitLabApiException e){
+            throw new GitLabRuntimeException(e.getLocalizedMessage());
+        }
+
+        return issueComments;
+
+    }
+
+    public List<CommentWrapper> getIssueCommentsByAuthor(Integer projectId, Date start, Date end, List<String> alias){
+        List<CommentWrapper> issueComments = getIssueComments(projectId, start, end);
+
+        List<CommentWrapper> filteredIssueComments = new ArrayList<>();
+        for(CommentWrapper comment : issueComments){
+            if(alias.contains(comment.getAuthor())){
+                filteredIssueComments.add(comment);
+            }
+        }
+
+        return filteredIssueComments;
+
+    }
+
+    public List<CommentWrapper> getMRComments(Integer projectId, String targetBranch, Date start, Date end){
+
+        List<MergeRequest> mergeRequests = getFilteredMergeRequestsNoDiff(projectId, targetBranch, start, end);
+
+        List<CommentWrapper> MRComments = new ArrayList<>();
+
+        try{
+            for(MergeRequest mergeRequest : mergeRequests){
+                List<Note> MRNotes = notesApi.getMergeRequestNotes(projectId, mergeRequest.getIid());
+                for(Note note : MRNotes){
+                    String commentAuthor = note.getAuthor().getUsername();
+                    String mergeRequestAuthor = mergeRequest.getAuthor().getUsername();
+                    CommentWrapper commentWrapper = new CommentWrapper(
+                            mergeRequest.getWebUrl(),
+                            note,
+                            commentAuthor.equals(mergeRequestAuthor));
+
+                    MRComments.add(commentWrapper);
+                }
+            }
+        } catch (GitLabApiException e){
+            throw new GitLabRuntimeException(e.getLocalizedMessage());
+        }
+
+        return MRComments;
+
+    }
+
+    public List<CommentWrapper> getMRCommentsByAuthor(Integer projectId, String targetBranch, Date start, Date end, List<String> alias){
+        List<CommentWrapper> MRComments = getMRComments(projectId, targetBranch, start, end);
+
+        List<CommentWrapper> filteredMRComments = new ArrayList<>();
+        for(CommentWrapper comment : MRComments){
+            if(alias.contains(comment.getAuthor())){
+                filteredMRComments.add(comment);
+            }
+        }
+
+        return filteredMRComments;
 
     }
 

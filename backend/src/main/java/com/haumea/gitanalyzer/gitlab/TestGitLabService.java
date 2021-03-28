@@ -357,6 +357,56 @@ public class TestGitLabService {
                         ", # diffs: " + mergeRequest.getDiffs().size());
     }
 
+    public void testGetIssueComments(Integer projectId, Date start, Date end){
+        System.out.println("\n---Testing getIssueComments---");
+
+        List<CommentWrapper> issueComments = gitlabService.getIssueComments(projectId, start, end);
+        for(CommentWrapper comment : issueComments){
+            System.out.println(
+                            "issue URL:" + comment.getUrl() +
+                            " is Own: " + comment.getIsSameAuthor() +
+                            " body: " + comment.getNote().getBody());
+        }
+    }
+
+    public void testGetIssueCommentsByAuthor(Integer projectId, Date start, Date end, List<String> alias){
+        System.out.println("\n---Testing getIssueCommentsByAuthor---");
+
+        List<CommentWrapper> issueComments = gitlabService.getIssueCommentsByAuthor(projectId, start, end, alias);
+        for(CommentWrapper comment : issueComments){
+            System.out.println(
+                            "issue URL:" + comment.getUrl() +
+                            " is Own: " + comment.getIsSameAuthor() +
+                            " body: " + comment.getNote().getBody() +
+                            " author: " + comment.getAuthor());
+        }
+    }
+
+    public void testGetMRComments(Integer projectId, String targetBranch, Date start, Date end){
+        System.out.println("\n---Testing getMRComments---");
+
+        List<CommentWrapper> MRComments = gitlabService.getMRComments(projectId, targetBranch, start, end);
+        for(CommentWrapper comment : MRComments){
+            System.out.println(
+                            "MR URL:" + comment.getUrl() +
+                            " is Own: " + comment.getIsSameAuthor() +
+                            " body: " + comment.getNote().getBody());
+        }
+    }
+
+    public void testGetMRCommentsByAuthor(Integer projectId, String targetBranch, Date start, Date end, List<String> alias){
+        System.out.println("\n---Testing getMRCommentsByAuthor---");
+
+        List<CommentWrapper> MRComments = gitlabService.getMRCommentsByAuthor(projectId, targetBranch, start, end, alias);
+        for(CommentWrapper comment : MRComments){
+            System.out.println(
+                            "issue URL:" + comment.getUrl() +
+                            " is Own: " + comment.getIsSameAuthor() +
+                            " body: " + comment.getNote().getBody() +
+                            " author: " + comment.getAuthor());
+        }
+    }
+
     // warning use on small project
     public void testScoreCalculator(Integer projectId) {
 
@@ -395,12 +445,5 @@ public class TestGitLabService {
         }
 
     }
-
-//    public void testMRScoring(String userId, int projectId, String memberId) {
-//
-////        MergeRequestService service = new MergeRequestService(use)
-//        List<MergeRequestDTO> mergeRequestDTOList =
-//    }
-
 
 }

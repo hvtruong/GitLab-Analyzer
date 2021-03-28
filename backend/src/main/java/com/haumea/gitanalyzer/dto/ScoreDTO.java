@@ -13,6 +13,15 @@ public class ScoreDTO {
     private double score;
     private Map<String, Double> scoreByFileTypes;
 
+    public ScoreDTO() {
+
+        this.linesAdded = 0;
+        this.linesRemoved = 0;
+        this.score = 0.0;
+        this.linesMoved = 0;
+        this.spaceLinesAdded = 0;
+    }
+
     public ScoreDTO(int linesAdded, int linesRemoved, double score, int linesMoved, int spaceLinesAdded) {
 
         this.linesAdded = linesAdded;

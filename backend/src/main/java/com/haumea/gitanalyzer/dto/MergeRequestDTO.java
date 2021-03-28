@@ -20,8 +20,22 @@ public class MergeRequestDTO {
     private int linesAdded;
     private int linesRemoved;
     private List<CommitDTO> commitDTOList;
+    private boolean isSharedMR;
+    private double sumOfCommitScoreOnSharedMR;
 
-    public MergeRequestDTO(int mergeId, String mergeRequestTitle, Date mergedDate, Date createdDate, Date updatedDate, String mergeRequestLink, double MRScore, double sumOfCommitScore, Map<String, Double> scoreByFileTypes, List<DiffDTO> mergeRequestDiffs, int linesAdded, int linesRemoved, List<CommitDTO> commitDTOList) {
+    public MergeRequestDTO(int mergeId,
+                           String mergeRequestTitle,
+                           Date mergedDate,
+                           Date createdDate,
+                           Date updatedDate,
+                           String mergeRequestLink,
+                           double MRScore,
+                           double sumOfCommitScore,
+                           Map<String, Double> scoreByFileTypes,
+                           List<DiffDTO> mergeRequestDiffs,
+                           int linesAdded,
+                           int linesRemoved,
+                           List<CommitDTO> commitDTOList) {
         this.mergeId = mergeId;
         this.mergeRequestTitle = mergeRequestTitle;
         this.mergedDate = mergedDate;
@@ -35,6 +49,8 @@ public class MergeRequestDTO {
         this.linesAdded = linesAdded;
         this.linesRemoved = linesRemoved;
         this.commitDTOList = commitDTOList;
+        this.isSharedMR = false;
+        this.sumOfCommitScoreOnSharedMR = 0.0;
     }
 
     public int getMergeId() {
@@ -87,6 +103,23 @@ public class MergeRequestDTO {
 
     public List<CommitDTO> getCommitDTOList() {
         return commitDTOList;
+    }
+
+    public boolean isSharedMR() {
+        return isSharedMR;
+    }
+
+    public void setSharedMR(boolean sharedMR) {
+        isSharedMR = sharedMR;
+    }
+
+    public double getSumOfCommitScoreOnSharedMR() {
+        return sumOfCommitScoreOnSharedMR;
+    }
+
+    public void setSumOfCommitScoreOnSharedMR(double sumOfCommitScoreOnSharedMR) {
+        ScoreDTO scoreDTO = new ScoreDTO();
+        this.sumOfCommitScoreOnSharedMR = scoreDTO.roundScore(sumOfCommitScoreOnSharedMR);
     }
 
 }
